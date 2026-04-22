@@ -1,6 +1,6 @@
 # Reproducible quarto manuscript for "Title"
 
-This is a repo for generating our manuscript.
+This is a template for generating a reproducible quarto manuscript.
 
 # Steps to reproduce:
 
@@ -34,16 +34,34 @@ rv sync
 ```bash
 cd notebooks/PythonFigures
 uv sync
-uv run --with jupyter jupyter lab
 ```
 
 add packages with `uv add <packagename>`
+
+Then you can create/edit your `.ipynb` file with `uv run --with jupyter jupyter lab`
 
 ## Quarto
 
 Now you can first preview, then render
 
 ```bash
-quarto preview --no-browser
+quarto preview --no-browser #You don't need this flag; it just suppresses the browser from opening
 quarto render
+```
+
+If you get some broken figure links, run `quarto preview` again
+
+For publishing to github, your `.github/workflow` will fail until you run `quarto publish gh-pages`
+
+## Snippets
+
+<!-- TODO: upload snippets file -->
+
+# Reminders
+
+When your paper is published, edit the `index.qmd` front matter:
+
+```
+citation:
+  container-title: Unpublished # change when published
 ```
