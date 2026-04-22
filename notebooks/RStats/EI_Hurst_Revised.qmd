@@ -1,0 +1,9 @@
+---
+title: "Stats"
+author: ""
+date: "2025-02-15"
+---
+
+```{r}
+# First, let's load our packages.
+```

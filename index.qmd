@@ -1,0 +1,261 @@
+---
+title: "Your title"
+titlerunning: ""
+authors:
+  - name: Alexander Mark Weber
+    orcid: 0000-0001-7295-0775
+    corresponding: true
+    email: aweber@bcchr.ca
+    roles:
+      - conceptualization
+      - data curation
+      - formal analysis
+      - funding acquisition
+      - investigation
+      - methodology
+      - project administration
+      - resources
+      - supervision
+      - validation
+      - visualization
+      - writing - review & editing
+    affiliations:
+      - ref: 1
+      - ref: 2
+      - ref: 3
+    degrees:
+      - PhD
+      - MSc
+affiliations:
+  - id: 1
+    name: School of Biomedical Engineering, The University of British Columbia, Vancouver, BC, Canada
+  - id: 2
+    name: BC Children's Hospital Research Institute, The University of British Columbia, Vancouver, BC, Canada
+  - id: 3
+    name: Pediatrics, The University of British Columbia, Vancouver, BC, Canada
+
+keywords:
+  - <sample keywords>
+filters:
+  - authors-block #requires extension
+
+appendix-style: none
+tbl-cap-location: bottom
+notebook-links: false
+number-sections: true
+citation:
+  container-title: Unpublished # change when published
+date: last-modified
+bibliography: references.bib
+csl: nature.csl
+
+crossref:
+  fig-title: "**Figure**"
+  tbl-title: "**Table**"
+  title-delim: "**.**"
+  custom:
+    - kind: float
+      key: suppfig
+      latex-env: suppfig
+      reference-prefix: "**Figure S**"
+      space-before-numbering: false
+      latex-list-of-description: Supplementary Figure
+    - kind: float
+      key: supptbl
+      latex-env: supptbl
+      reference-prefix: "**Table S**"
+      space-before-numbering: false
+      latex-list-of-description: Supplementary Table
+---
+
+```{r}
+#| label: setup
+#| include: false
+# options
+knitr::opts_chunk$set(
+  # fig.width=8, fig.height=5,
+  # out.width="50%",
+  # fig.align="center",
+  echo = FALSE,
+  message = FALSE,
+  warning = FALSE
+  # cache=TRUE
+)
+set.seed(1234) # reproducible
+options(knitr.kable.NA = "") # how kable handles NA
+options(reticulate.repl.quiet = TRUE)
+```
+
+```{r}
+#| label: libraries
+# libraries
+library(tidyverse) # ggplot2, dplyr, tidyr, readr, purrr, tibble, stringr, forcats
+library(english) # numbers to words
+library(tools) # title-case
+library(patchwork) # figure manipulation
+library(magick) # load images
+library(ggpubr)
+library(knitr)
+library(RcppTOML)
+# library(kableExtra)
+```
+
+```{r}
+#| label: loadRdata
+load("notebooks/RStats/results.RData") # load R data
+```
+
+```{r}
+#| label: functions
+format_p <- function(p, digits = 2) {
+  if (p < 0.01) {
+    "< 0.01"
+  } else {
+    format(round(p, digits), nsmall = digits)
+  }
+}
+capitalize_first <- function(x) {
+  paste0(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)))
+} # capitalize first letter
+```
+
+## Abstract {.unnumbered}
+
+# Introduction
+
+# Methods
+
+## Participants
+
+`r capitalize_first(as.character(english(as.numeric(count(orig_subjects)+1))))` healthy adult participants were recruited to the study. One participant was not scanned due to claustrophobia while in the scanner. After our analysis and performing quality assurance (see below for details), a further `r as.character(english(as.numeric(count(orig_subjects) - count(subjects))))` participants were removed, leaving `r as.character(english(as.numeric(count(subjects))))` final participants, between the ages of `r round(min(subjects$Age),1)` and `r round(max(subjects$Age),1)` (mean age ± sd: `r round(mean(subjects$Age),1)` ± `r round(sd(subjects$Age),1)` years; `r sum(subjects$Sex == "M")` males). Sex, handedness and date of birth were recorded on the day of the scan.
+
+## Ethics Statement
+
+Written informed consent was obtained from all participants. Ethics approval was granted by the Clinical Research Ethics Board at the University of British Columbia and BC Children's & Women's Hospital (\*\*\*).
+
+<!-- TODO: add CEB number above -->
+
+## Scanning Procedure
+
+```{r}
+#| label: fig-method
+#| fig-cap: "**Overview of the MRI acquisition protocol.** A) fMRI coverage was across the whole-brain (example coverage in red). MRS voxels were placed in the visual cortex (blue). Background image is of a T1w acquisition from a sample subject. Figure was inspired by Ip et al. (2017) [@ipCombinedFMRIMRSAcquires2017]. B) fMRI, sLASER, and MEGA-PRESS were acquired first with participants looking at a white cross for 24 minutes. Next, the same sequences were acquired with the participants viewing a nature documentary for an identical period of time."
+
+layout <- "
+  #AA#
+  BBBB
+  "
+
+fmrimrs <- image_read("Figures/StudyDesign/studydesign_fmri_mrs.png")
+fmrimrs_dim <- image_info(fmrimrs)
+fmrimrs <- ggplot() +
+  background_image(fmrimrs) +
+  theme_void() #+ theme(aspect.ratio = fmrimrs_dim$height / fmrimrs_dim$width)
+
+studydesign <- image_read("Figures/StudyDesign/StudyDesign.png")
+studydesign <- ggplot() +
+  background_image(studydesign) +
+  theme_void()
+# p <- (fmrimrs + plot_spacer()) / studydesign
+p <- fmrimrs + studydesign + plot_layout(design = layout)
+# p + plot_annotation(tag_levels = 'A') & theme(plot.tag = element_text(size = 11))
+p + plot_annotation(tag_levels = "A") & theme(plot.tag = element_text(size = 11))
+```
+
+## Acquisition Details {#sec-mriacq}
+
+| Sequence               | TE (ms)              | TR (ms) | Flip Angle | FOV       | Slice Thickness (mm) | In-Plane Resolution (mm²) | Other Parameters                                                             | Time (mins) |
+| ---------------------- | -------------------- | ------- | ---------- | --------- | -------------------- | ------------------------- | ---------------------------------------------------------------------------- | ----------- |
+| 3D T1-weighted FSPGR   | 2.176                | 7.216   | 12         | 256 × 256 | 0.9                  | 0.9375 × 0.9375           | -                                                                            | 5           |
+| 3D T2-weighted CUBE    | 75.242               | 2,504.0 | 90         | 256 x 256 | 0.9                  | 0.9375 × 0.9375           | -                                                                            | 4           |
+| 2D EPI Multi-Echo fMRI | 12.2, 35.352, 58.504 | 1,500   | 52         | 64 x 64   | 3.6                  | 3.5938 × 3.5938           | Acceleration factor = 6                                                      | 12          |
+| sLASER                 | 35                   | 2,000   | 90         | -         | 28.0                 | 28.0 x 28.0               | Transients = 128\*; Spectral width = 5,000 Hz; Data points = 4,096           | 4           |
+| MEGA-PRESS             | 68                   | 1,800   | 90         | -         | 28.0                 | 28.0 x 28.0               | Transients = 128 ON, 128 OFF; Spectral width = 5,000 Hz; Data points = 4,096 | 8           |
+
+: **Summary of MRI acquisition details** TE = echo time; TR = repetition time; FOV = field of view; FSPGD = fast spoiled gradient-echo; CUBE = a GE acronym; EPI = echo-planar imaging; fMRI = functional magnetic resonance imaging; sLASER = semi localization by adiabatic selective refocusing; MEGA-PRESS = Mescher-Garwood point-resolved spectroscopy. \*Note, the GE semi-LASER sequence averaged the 128 transients into groups of 4, each with 32 transients, before being saved as raw P-file. {#tbl-mriacq}
+
+$$
+H = \frac{1 + \beta}{2}
+$$
+
+All statistical analyses were performed using `R` (v`r RcppTOML::parseTOML("rproject.toml")$project$r_version`) [@rcoreteamLanguageEnvironmentStatistical2021].
+
+# Results
+
+## Participant Demographics
+
+`r capitalize_first(as.character(english(as.numeric(count(orig_subjects)+1))))` participants were originally recruited for the study. `r capitalize_first(as.character(english(as.numeric(count(orig_subjects)))))` of these participants were successfully scanned, but one participant experienced claustrophobia and chose not to continue. Of the remaining `r count(orig_subjects)` participants, `r count(subjects)` were included in the final analysis: `r as.character(english(as.numeric(count(mrsremoved))))` were removed due to low MRS quality (FWHM > 10) and `r as.character(english(as.numeric(count(fmriremoved))))` were removed due to low fMRI quality (mean FD > 0.15 mm). See @fig-partflow.
+
+![**Flowchart of participant, recruitment, scanning and exclusion**. The number of participants at each stage is indicated within each node. Participants were excluded based on MRS FWHM and fMRI Mean FD thresholds, resulting in 18 participants included in the final analysis](./Figures/ParticipantFlow.png){#fig-partflow}
+
+# Discussion
+
+This study provides ...
+
+## Limitations and Strengths
+
+# Conclusion
+
+In conclusion, ...
+
+# Data availability statement {.unnumbered}
+
+All code used in this paper is available at [github.com/WeberLab/](https://github.com/WeberLab/). The raw MRI data used in this paper is available by contacting the author. The manuscript was written in a 'reproducible manner': the entire manuscript, including statistics reported, figures, and tables, can be reproduced here: [weberlab.github.io/](https://weberlab.github.io/)
+
+# Competing interests {.unnumbered}
+
+The authors declare they have no known competing interests.
+
+# Author contributions {.unnumbered}
+
+AMW was responsible for conceptualization, data curation, formal analysis, funding acquisition, investigation, methodology, project administration, resources, supervision, validation, visualization, and writing - review & editing.
+
+# Acknowledgements {.unnumbered}
+
+The work presented in this paper was supported in part by funding from ...
+
+# References {.unnumbered}
+
+::: {#refs}
+:::
+
+\newpage
+
+# Supplementary Material {.appendix .unnumbered}
+
+## Example supplementary table {.unnumbered}
+
+A summary of MRS quality, such as water FWHM, Cr SNR, and frequency shift are provided in @supptbl-quality.
+
+::: {#supptbl-quality}
+| Measure | Rest sLASER | Rest MEGA-PRESS | Movie sLASER | Movie MEGA-PRESS |
+|---|---|---|---|---|
+| water FWHM (Hz) | `r as.numeric(fwhm_stats[2,3, drop = T])` ± `r as.numeric(fwhm_stats[2,4, drop = T])` | `r as.numeric(fwhm_stats[1,3, drop = T])` ± `r as.numeric(fwhm_stats[1,4, drop = T])` | `r as.numeric(fwhm_stats[4,3, drop = T])` ± `r as.numeric(fwhm_stats[4,4, drop = T])` | `r as.numeric(fwhm_stats[3,3, drop = T])` ± `r as.numeric(fwhm_stats[3,4, drop = T])` |
+| Cr SNR | `r as.numeric(crsnr_stats[2,3, drop = T])` ± `r as.numeric(crsnr_stats[2,4, drop = T])` | `r as.numeric(crsnr_stats[1,3, drop = T])` ± `r as.numeric(crsnr_stats[1,4, drop = T])` | `r as.numeric(crsnr_stats[4,3, drop = T])` ± `r as.numeric(crsnr_stats[4,4, drop = T])` | `r as.numeric(crsnr_stats[3,3, drop = T])` ± `r as.numeric(crsnr_stats[3,4, drop = T])` |
+| Frequency Shift (ppm) | `r as.numeric(freqshift_stats[2,3, drop = T])` ± `r as.numeric(freqshift_stats[2,4, drop = T])` | `r as.numeric(freqshift_stats[1,3, drop = T])` ± `r as.numeric(freqshift_stats[1,4, drop = T])` | `r as.numeric(freqshift_stats[4,3, drop = T])` ± `r as.numeric(freqshift_stats[4,4, drop = T])` | `r as.numeric(freqshift_stats[3,3, drop = T])` ± `r as.numeric(freqshift_stats[3,4, drop = T])` |
+
+**Summary of spectroscopy quality measures.** FWHM = full-width half-maximum; Cr = creatine; SNR = signal-to-noise ratio.
+:::
+
+## Example supplementary figure {.unnumbered}
+
+Linear-mixed effects model diagnostics are provided in @suppfig-lmemdiag.
+
+::: {#suppfig-lmemdiag}
+
+```{r}
+#| fig-width: 5
+#| fig-height: 5
+layout <- "
+  AAA
+  BBB
+  CCC
+  "
+
+modelresiduals_plot + modelhistresiduals_plot + modelqqnorm_plot +
+  plot_layout(design = layout) +
+  plot_annotation(tag_levels = "A") & theme(plot.tag = element_text(size = 11))
+```
+
+**Linear-mixed effects model tests for normality.** Model diagnostics for the linear mixed effects model predicting Hurst exponent from the EI ratio. A) Residuals vs. fitted values showing homoscedasticity. B) Histogram of residuals. C) Q-Q plot indicating normally distributed residuals.
+:::

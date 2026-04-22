@@ -1,0 +1,47 @@
+project:
+  type: manuscript
+  render:
+    - "!notes.md"
+    - "!rv/"
+    - "*.qmd"
+    - "*.ipynb"
+
+manuscript:
+  article: index.qmd
+
+# code-links:
+# - repo
+# - binder
+
+execute:
+  freeze: auto
+  # cache: false
+
+format:
+  # pdf:
+  #   colorlinks: true
+  #   keep-tex: true
+  nature-pdf:
+    # include-in-header:
+    #   - text: |
+    #       \usepackage{breqn}
+    journal:
+      cite-style: sn-nature
+      keep-tex: true
+      colorlinks: true
+      link-citations: true
+      pdf-engine: xelatex
+    cite-method: natbib
+  docx:
+    reference-doc: custom-reference.docx
+    line-numbers: false
+  html:
+    embed-resources: true
+    notebook-links: true
+    toc: true
+    comments:
+      hypothesis: true
+  # jats: default
+
+filters:
+  - parse-latex
