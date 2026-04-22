@@ -6,6 +6,8 @@ This is a repo for generating our manuscript.
 
 ## Clone this repo
 
+`gh repo clone WeberLab/Reproducible_Manuscript_Template`
+
 ## rv package manager for r
 
 You will find an `rproject.toml` file in the main directory and the `notebooks` directory. These define the R version and the package to install.
