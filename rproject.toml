@@ -26,4 +26,5 @@ dependencies = [
   "ggpubr",
   "knitr",
   "RcppTOML",
+    "quarto",
 ]

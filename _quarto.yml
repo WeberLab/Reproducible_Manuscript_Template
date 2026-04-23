@@ -18,6 +18,12 @@ execute:
   # cache: false
 
 format:
+  html:
+    embed-resources: true
+    notebook-links: true
+    toc: true
+    comments:
+      hypothesis: true
   # pdf:
   #   colorlinks: true
   #   keep-tex: true
@@ -35,12 +41,6 @@ format:
   docx:
     reference-doc: custom-reference.docx
     line-numbers: false
-  html:
-    embed-resources: true
-    notebook-links: true
-    toc: true
-    comments:
-      hypothesis: true
   # jats: default
 
 filters:
